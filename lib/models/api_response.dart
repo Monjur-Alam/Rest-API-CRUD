@@ -3,7 +3,7 @@ class APIResponse<T> {    //T = Generic type parameter.
   bool error;
   String errorMessage;
 
-  APIResponse({required this.data, required this.errorMessage, required this.error});
+  APIResponse({required this.data, this.errorMessage = '', this.error=false});
 
 
 }
