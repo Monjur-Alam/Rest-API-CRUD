@@ -13,7 +13,7 @@ class NoteList extends StatefulWidget {
 }
 
 class _NoteListState extends State<NoteList> {
-  NoteService get service => GetIt.I<NoteService>();
+  NotesService get service => GetIt.I<NotesService>();
   late APIResponse<List<NoteForListing>> _apiResponse;
   bool _isLoading = false;
 
@@ -53,7 +53,7 @@ class _NoteListState extends State<NoteList> {
         body: Builder(
           builder: (_) {
             if (_isLoading) {
-              return CircularProgressIndicator();
+              return Center(child: CircularProgressIndicator());
             }
             if (_apiResponse.error) {
               return Center(child: Text(_apiResponse.errorMessage));
