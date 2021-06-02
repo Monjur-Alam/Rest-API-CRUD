@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:rest_api_flutter/models/note.dart';
-import 'package:rest_api_flutter/models/note_insert.dart';
+import 'package:rest_api_flutter/models/note_manipulation.dart';
 import 'package:rest_api_flutter/services/notes_service.dart';
 
 class NoteModify extends StatefulWidget {
@@ -56,71 +56,110 @@ class _NoteModifyState extends State<NoteModify> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: _isLoading ? Center(child: CircularProgressIndicator()) : Column(
-          children: [
-            TextField(
-              controller: _titleController,
-              decoration: InputDecoration(hintText: 'Note title'),
-            ),
-            Container(height: 8),
-            TextField(
-              controller: _contentController,
-              decoration: InputDecoration(hintText: 'Note content'),
-            ),
-            Container(height: 16),
-            SizedBox(
-              width: double.infinity,
-              height: 35,
-              child: RaisedButton(
-                onPressed: () async {
-                  if (isEditing) {
-                    // update note in api
-                  } else {
-                    // create note in api
-                    setState(() {
-                      _isLoading = true;
-                    });
-                    final note = NoteInsert(noteTitle: _titleController.text, noteContent: _contentController.text);
-                    final result = await notesService.createNote(note);
+        child: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : Column(
+                children: [
+                  TextField(
+                    controller: _titleController,
+                    decoration: InputDecoration(hintText: 'Note title'),
+                  ),
+                  Container(height: 8),
+                  TextField(
+                    controller: _contentController,
+                    decoration: InputDecoration(hintText: 'Note content'),
+                  ),
+                  Container(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 35,
+                    child: RaisedButton(
+                      onPressed: () async {
+                        if (isEditing) {
+                          // update note in api
+                          setState(() {
+                            _isLoading = true;
+                          });
+                          final note = NoteManipulation(
+                              noteTitle: _titleController.text,
+                              noteContent: _contentController.text);
+                          final result = await notesService.updateNote(widget.noteID, note);
 
-                    setState(() {
-                      _isLoading = false;
-                    });
+                          setState(() {
+                            _isLoading = false;
+                          });
 
-                    final title = 'Done';
-                    final text = result.error ? result.errorMessage : 'Your note was created';
+                          final title = 'Done';
+                          final text = result.error
+                              ? result.errorMessage
+                              : 'Your note was updated';
 
-                    showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          title: Text(title),
-                          content: Text(text),
-                          actions: [
-                            FlatButton(
-                              child: Text('Ok'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            )
-                          ],
-                        )
-                    )
-                    .then((data) {
-                      if (result.data) {
-                        Navigator.of(context).pop();
-                      }
-                    });
-                  }
-                },
-                child: Text(
-                  'Submit',
-                  style: TextStyle(color: Colors.white),
-                ),
-                color: Theme.of(context).primaryColor,
+                          showDialog(
+                              context: context,
+                              builder: (_) => AlertDialog(
+                                    title: Text(title),
+                                    content: Text(text),
+                                    actions: [
+                                      FlatButton(
+                                        child: Text('Ok'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      )
+                                    ],
+                                  )).then((data) {
+                            if (result.data) {
+                              Navigator.of(context).pop();
+                            }
+                          });
+                        } else {
+                          // create note in api
+                          setState(() {
+                            _isLoading = true;
+                          });
+                          final note = NoteManipulation(
+                              noteTitle: _titleController.text,
+                              noteContent: _contentController.text);
+                          final result = await notesService.createNote(note);
+
+                          setState(() {
+                            _isLoading = false;
+                          });
+
+                          final title = 'Done';
+                          final text = result.error
+                              ? result.errorMessage
+                              : 'Your note was created';
+
+                          showDialog(
+                              context: context,
+                              builder: (_) => AlertDialog(
+                                    title: Text(title),
+                                    content: Text(text),
+                                    actions: [
+                                      FlatButton(
+                                        child: Text('Ok'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      )
+                                    ],
+                                  )).then((data) {
+                            if (result.data) {
+                              Navigator.of(context).pop();
+                            }
+                          });
+                        }
+                      },
+                      child: Text(
+                        'Submit',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  )
+                ],
               ),
-            )
-          ],
-        ),
       ),
     );
   }

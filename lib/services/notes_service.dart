@@ -5,7 +5,7 @@ import 'package:rest_api_flutter/models/api_response.dart';
 import 'package:rest_api_flutter/models/note.dart';
 import 'package:rest_api_flutter/models/note_for_listing.dart';
 import 'package:http/http.dart' as http;
-import 'package:rest_api_flutter/models/note_insert.dart';
+import 'package:rest_api_flutter/models/note_manipulation.dart';
 import 'package:rest_api_flutter/views/note_delete.dart';
 
 class NotesService {
@@ -47,11 +47,24 @@ class NotesService {
             data: notes, error: true, errorMessage: 'An error occured'));
   }
 
-  Future<APIResponse<bool>> createNote(NoteInsert noteInsert) {
+  Future<APIResponse<bool>> createNote(NoteManipulation noteInsert) {
     return http
         .post(Uri.parse(API + '/notes'), headers: headers, body: json.encode(noteInsert.toJson()))
         .then((data) {
       if (data.statusCode == 201) {
+        return APIResponse<bool>(data: true);
+      }
+      return APIResponse<bool>(
+          data: notes, error: true, errorMessage: 'An error occured');
+    }).catchError((_) => APIResponse<bool>(
+            data: notes, error: true, errorMessage: 'An error occured'));
+  }
+
+  Future<APIResponse<bool>> updateNote(String noteID, NoteManipulation noteInsert) {
+    return http
+        .put(Uri.parse(API + '/notes/' + noteID), headers: headers, body: json.encode(noteInsert.toJson()))
+        .then((data) {
+      if (data.statusCode == 204) {
         return APIResponse<bool>(data: true);
       }
       return APIResponse<bool>(
